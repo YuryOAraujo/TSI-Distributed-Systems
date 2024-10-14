@@ -14,6 +14,7 @@ class Client:
         operation += '\0'
         client_socket.sendall(operation.encode())
         data = client_socket.recv(1024)
+        client_socket.close()
         return data.decode()
 
     def format_message(self, operator, first, second):

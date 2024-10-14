@@ -36,19 +36,19 @@ class Server:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
             server_socket.bind((self.address, self.port))
             server_socket.listen()
-            data = ''
 
             while True:
                 client_socket, addr = server_socket.accept()
                 with client_socket:
+                    data = ''
                     while True:
                         chunk = client_socket.recv(1024)
-                        chunk_str = chunk.decode()  # Decode the bytes to a string
+                        chunk_str = chunk.decode()
                         if '\0' in chunk_str:
                             data += chunk_str.replace('\0', '')
                             break
                         data += chunk_str
-
+                    
                     operation = data
                     result = self.verify_operation(operation)
                     client_socket.sendall(result.encode())
