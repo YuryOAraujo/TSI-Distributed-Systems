@@ -1,14 +1,21 @@
 import socket
 import time
 import threading
+import multiprocessing
 import json
 
 class Server:
-    def __init__(self, address='127.0.0.1', port=65432):
-        self.address = address
-        self.port = port
+    def __init__(self, config_file='rpc/config.json'):
+        self.load_config(config_file)
         self.functions = {'+': self.sum, '-': self.sub, '*': self.mul, '/': self.div, '#': self.sum_n, '&': self.wait_n_seconds}
         print(f"Server listening on {self.address}:{self.port}")
+
+    def load_config(self, config_file):
+        with open(config_file, 'r') as file:
+            config = json.load(file)
+            self.address = config['server']['address']
+            self.port = config['server']['port']
+            self.parallelism = config['server']['parallelism']
 
     def verify_operation(self, operation):
         operation, *rest = operation.split(' ')
@@ -69,8 +76,12 @@ class Server:
 
             while True:
                 client_socket, addr = server_socket.accept()
-                client_thread = threading.Thread(target=self.handle_client, args=(client_socket, addr))
-                client_thread.start()
+                if self.parallelism == 'thread':
+                    client_thread = threading.Thread(target=self.handle_client, args=(client_socket, addr))
+                    client_thread.start()
+                elif self.parallelism == 'process':
+                    client_process = multiprocessing.Process(target=self.handle_client, args=(client_socket, addr))
+                    client_process.start()
 
 if __name__ == "__main__":
     server = Server()

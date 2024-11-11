@@ -6,12 +6,6 @@ class Client:
         self.server_address = server_address
         self.server_port = server_port
 
-    def load_config(self, config_file):
-        with open(config_file, 'r') as f:
-            config = json.load(f)
-            self.server_address = config["client"]["server_address"]
-            self.server_port = config["client"]["server_port"]
-
     def start(self):
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client_socket.connect((self.server_address, self.server_port))
