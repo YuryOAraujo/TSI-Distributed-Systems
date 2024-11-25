@@ -1,5 +1,5 @@
 import time
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt # type: ignore
 from rpc import client
 import os
 
