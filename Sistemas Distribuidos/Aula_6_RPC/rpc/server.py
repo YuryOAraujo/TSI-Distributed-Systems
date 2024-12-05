@@ -3,13 +3,39 @@ import time
 import threading
 import multiprocessing
 import json
+import os
+import pickle
+from collections import OrderedDict
 
 class Server:
-    def __init__(self, config_file='config.json'):
+    def __init__(self, config_file='config.json', cache_file='cache.json'):
         self.load_config(config_file)
         self.functions = {'sum': self.sum, 'sub': self.sub, 'mul': self.mul, 'div': self.div, 'sum_n': self.sum_n, 'wait_n_seconds': self.wait_n_seconds, 'check_primes': self.check_primes, 'check_primes_parallel': self.check_primes_parallel}
         self.mul_cache = {}
+        self.cache_file = cache_file
+        self.initialize_cache()
         print(f"Server listening on {self.address}:{self.port}")
+
+    def initialize_cache(self):
+        if not os.path.exists(self.cache_file):
+            with open(self.cache_file, 'wb') as file:
+                pickle.dump(OrderedDict(), file)
+
+    def read_cache(self):
+        if os.path.getsize(self.cache_file) > 0:
+            with open(self.cache_file, 'rb') as file:
+                return pickle.load(file)
+        return OrderedDict()
+    
+    def write_cache(self, cache):
+        with open(self.cache_file, 'wb') as file:
+            pickle.dump(cache, file)
+
+    def manage_cache_size(self):
+        cache = self.read_cache()
+        while os.path.getsize(self.cache_file) > self.primes_cache_bytes and cache != {}:
+            cache.popitem(last=False)
+        self.write_cache(cache)
 
     def load_config(self, config_file):
         with open(config_file, 'r') as file:
@@ -68,12 +94,27 @@ class Server:
                 return False
         return True
     
+    def is_prime_cache(self, n):
+        cache = self.read_cache()
+
+        if n in cache:
+            print(f'Número {n} encontrado em cache')
+            return cache[n]
+        
+        print(f'Número {n} não encontrado em cache')
+        cache[n] = self.is_prime(n)
+            
+        self.write_cache(cache) 
+        self.manage_cache_size()
+
+        return cache[n]
+    
     def check_primes(self, list: list[int]):
-        return [self.is_prime(i) for i in list]
+        return [self.is_prime_cache(i) for i in list]
     
     def check_primes_parallel(self, list: list[int], n_process: int):
         with multiprocessing.Pool(n_process) as pool:
-            return pool.map(self.is_prime, list)
+            return pool.map(self.is_prime_cache, list)
 
     def handle_client(self, client_socket, addr):
         print(f"New connection from {addr}")

@@ -1,15 +1,18 @@
 import time
-import matplotlib.pyplot as plt # type: ignore
+# import matplotlib.pyplot as plt # type: ignore
 from rpc import client
 import os
 
 client = client.Client('127.0.0.1', 65432)
 
-print(client.div(1, 2))
-print(client.div(2, 2))
-print(client.div(1, 3))
-print(client.div(1, 5))
-print(client.div(1, 5))
+print(client.check_primes([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]))
+print(client.check_primes([i for i in range (10, 20)]))
+
+# print(client.div(1, 2))
+# print(client.div(2, 2))
+# print(client.div(1, 3))
+# print(client.div(1, 5))
+# print(client.div(1, 5))
 
 # input_sizes = [100, 1_000, 5_000, 10_000, 20_000, 100_000, 500_000, 1_000_000, 2_000_000]
 # sequential_times = []
