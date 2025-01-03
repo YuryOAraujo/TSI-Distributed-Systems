@@ -98,10 +98,8 @@ class Server:
         cache = self.read_cache()
 
         if n in cache:
-            # print(f'Número {n} encontrado em cache')
             return cache[n]
         
-        # print(f'Número {n} não encontrado em cache')
         cache[n] = self.is_prime(n)
             
         self.write_cache(cache) 

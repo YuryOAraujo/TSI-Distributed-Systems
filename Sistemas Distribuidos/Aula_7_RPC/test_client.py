@@ -3,14 +3,14 @@ import time
 from rpc import client
 import os
 
-client = client.Client('127.0.0.1', 65432)
+client = client.Client()
 
 # print(client.check_primes([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]))
-print(client.check_primes([i for i in range (600)]))
+# print(client.check_primes([i for i in range (600)]))
 
-# print(client.div(1, 2))
-# print(client.div(2, 2))
-# print(client.div(1, 3))
+print(client.sum(1, 2))
+print(client.div(2, 2))
+print(client.mul(1, 3))
 # print(client.div(1, 5))
 # print(client.div(1, 5))
 
