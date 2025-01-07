@@ -1,0 +1,28 @@
+{
+    "server": {
+      "address": "127.0.0.1",
+      "port": 65432,
+      "parallelism": "thread",
+      "primes_cache_bytes": 4096,
+      "log_file": "rpc_server.log"
+    },
+    "client": {
+      "div_cache_n": 3
+    },
+    "dns_server": {
+      "address": "127.0.0.1",
+      "port": 65433,
+      "servers": {
+        "sum": ["127.0.0.1:65432","127.0.0.1:65432","127.0.0.1:65432"],
+        "sub": ["127.0.0.1:65432"],
+        "mul": ["127.0.0.1:65432"],
+        "div": ["127.0.0.1:65432"],
+        "sum_n": ["127.0.0.1:65432"],
+        "wait_n_seconds": ["127.0.0.1:65432"],
+        "check_primes": ["127.0.0.1:65432"],
+        "check_primes_parallel": ["127.0.0.1:65432"],
+        "validate_cpf": ["127.0.0.1:65432"]
+      }
+    }
+  }
+  

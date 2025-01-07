@@ -1,0 +1,12 @@
+{
+    "server": {
+      "address": "127.0.0.1",
+      "port": 65432,
+      "parallelism": "thread",
+      "primes_cache_bytes": 4096
+    },
+    "client": {
+      "div_cache_n": 3
+    }
+  }
+  
