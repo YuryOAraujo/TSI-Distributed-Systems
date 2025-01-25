@@ -6,6 +6,7 @@ import json
 import os
 import pickle
 from collections import OrderedDict
+import ssl
 
 class Server:
     def __init__(self, config_file='config.json', cache_file='cache.json'):
@@ -161,19 +162,23 @@ class Server:
         print(f"Connection from {addr} closed.")
 
     def start(self):
+        context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+        context.load_cert_chain(certfile="cert.pem", keyfile="key.pem")
+
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
             server_socket.bind((self.address, self.port))
             server_socket.listen()
             print(f"Server listening on {self.address}:{self.port}")
 
-            while True:
-                client_socket, addr = server_socket.accept()
-                if self.parallelism == 'thread':
-                    client_thread = threading.Thread(target=self.handle_client, args=(client_socket, addr))
-                    client_thread.start()
-                elif self.parallelism == 'process':
-                    client_process = multiprocessing.Process(target=self.handle_client, args=(client_socket, addr))
-                    client_process.start()
+            with context.wrap_socket(server_socket, server_side=True) as ssl_socket:
+                while True:
+                    client_socket, addr = ssl_socket.accept()
+                    if self.parallelism == 'thread':
+                        client_thread = threading.Thread(target=self.handle_client, args=(client_socket, addr))
+                        client_thread.start()
+                    elif self.parallelism == 'process':
+                        client_process = multiprocessing.Process(target=self.handle_client, args=(client_socket, addr))
+                        client_process.start()
 
 if __name__ == "__main__":
     server = Server()

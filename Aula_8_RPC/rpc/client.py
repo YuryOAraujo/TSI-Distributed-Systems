@@ -2,6 +2,7 @@ import socket
 import json
 import random
 import pickle
+import ssl
 
 class Client:
     def __init__(self, config_file='rpc/config.json'):
@@ -32,9 +33,16 @@ class Client:
 
     def start(self, operation):
         self.server_address, self.server_port = self.handle_domain(operation)
+        context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
+        context.load_verify_locations(cafile="rpc/cert.pem")
+
+        context.check_hostname = False
+        context.verify_mode = ssl.CERT_NONE
+
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        client_socket.connect((self.server_address, self.server_port))
-        return client_socket
+        ssl_socket = context.wrap_socket(client_socket, server_hostname=self.server_address)
+        ssl_socket.connect((self.server_address, self.server_port))
+        return ssl_socket
         
     def send_message(self, client_socket, operation):
         operation += '\0'
